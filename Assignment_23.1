@@ -1,0 +1,10 @@
+val tweets = sqlContext.read.json("file:///home/cloudera/Desktop/Acadgild/Assignment_23.1/tweets")
+
+tweets.registerTempTable("tweets")
+
+val hashtags = sqlContext.sql("select id as id,entities.hashtags.text as words from tweets").registerTempTable("hashtags")
+
+val hashtag_word = sqlContext.sql("select id as id,hashtag from hashtags LATERAL VIEW explode(words) w as hashtag").registerTempTable("hashtag_word")
+
+val popular_hashtags = sqlContext.sql("select hashtag, count(hashtag) as cnt from hashtag_word group by hashtag order by cnt desc").show
+
